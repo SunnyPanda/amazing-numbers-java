@@ -1,13 +1,25 @@
 package numbers;
 
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static numbers.Utils.*;
+import static numbers.Validators.checkParameters;
+import static numbers.Validators.isExistingProperty;
 
 public class Main {
     private static final Scanner in = new Scanner(System.in);
+    private static final Map<String, Function<String, Boolean>> functionMap = new HashMap<>();
+    static {
+        functionMap.put("even", Utils::isEven);
+        functionMap.put("odd", Utils::isOdd);
+        functionMap.put("buzz", Utils::isBuzz);
+        functionMap.put("duck", Utils::isDuck);
+        functionMap.put("palindromic", Utils::isPalindromic);
+        functionMap.put("gapful", Utils::isGapful);
+        functionMap.put("spy", Utils::isSpy);
+    }
     public static void main(String[] args) {
         greet();
 
@@ -21,9 +33,13 @@ public class Main {
                     if (checkParameters(number, String.valueOf(Integer.MIN_VALUE)))
                         showProperties(number);
                 }
-                default -> {
+                case 2 -> {
                     if (checkParameters(input.get(0), input.get(1)))
                         showMultipleProperties(input.get(0), input.get(1));
+                }
+                default -> {
+                    if (checkParameters(input.get(0), input.get(1)) && isExistingProperty(input.get(2)))
+                        showSpecificProperty(input.get(0), input.get(1), input.get(2));
                 }
             }
 
@@ -47,7 +63,8 @@ public class Main {
                 - enter a natural number to know its properties;
                 - enter two natural numbers to obtain the properties of the list:
                   * the first parameter represents a starting number;
-                  * the second parameter shows how many consecutive numbers are to be processed;
+                  * the second parameters show how many consecutive numbers are to be processed;
+                - two natural numbers and a property to search for;
                 - separate the parameters with one space;
                 - enter 0 to exit.
                 """;
@@ -55,20 +72,6 @@ public class Main {
 
     private static List<String> getInput() {
         return Arrays.stream(in.nextLine().split(" ")).collect(Collectors.toList());
-    }
-
-    private static boolean checkParameters(String first, String second) {
-        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
-        boolean firstMatches = pattern.matcher(first).matches();
-        boolean secondMatches = pattern.matcher(second).matches();
-        if (!firstMatches || Long.parseLong(first) < 0) {
-            System.out.println("The first parameter should be a natural number or zero.");
-            return false;
-        }
-        if (!secondMatches || Long.parseLong(second) > Integer.MIN_VALUE && Long.parseLong(second) <= 0) {
-            System.out.println("The second parameter should be a natural number.");
-        }
-        return true;
     }
 
     private static void showProperties(String number) {
@@ -80,20 +83,36 @@ public class Main {
                         duck: %b
                  palindromic: %b
                       gapful: %b
+                         spy: %b
                 """, number, isEven(number), isOdd(number), isBuzz(number), isDuck(number), isPalindromic(number),
-                isGapful(number));
+                isGapful(number), isSpy(number));
+    }
+
+    private static void showSpecificProperty(String number, String count, String property) {
+        long num = Long.parseLong(number);
+        List<String> filteredNumbers = new ArrayList<>();
+        for (long i = 0; i < Long.parseLong(count); num++) {
+            if (functionMap.get(property.toLowerCase()).apply(String.valueOf(num))) {
+                filteredNumbers.add(String.valueOf(num));
+                i++;
+            }
+        }
+        showMultipleProperties(filteredNumbers);
+    }
+
+    private static void showMultipleProperties(List<String> numbers) {
+        numbers.forEach(n -> System.out.println(getProperties(Long.parseLong(n))));
     }
 
     private static void showMultipleProperties(String number, String count) {
         long num = Long.parseLong(number);
         for (long i = 0; i < Long.parseLong(count); i++, num++) {
-            System.out.println(getProperties(number));
+            System.out.println(getProperties(num));
         }
     }
 
-    private static String getProperties(String number) {
-        Map<String, Boolean> properties = fillProperties(number);
-        List<String> trueProperties = filterProperties(properties);
+    private static String getProperties(long number) {
+        List<String> trueProperties = filterProperties(String.valueOf(number));
 
         StringBuilder sb = new StringBuilder(String.format("%s is", number));
         for (int i = 0; i < trueProperties.size(); i++) {
@@ -103,21 +122,10 @@ public class Main {
         return sb.toString();
     }
 
-    private static Map<String, Boolean> fillProperties(String number) {
-        Map<String, Boolean> properties = new HashMap<>();
-        properties.put("even", isEven(number));
-        properties.put("odd", isOdd(number));
-        properties.put("buzz", isBuzz(number));
-        properties.put("duck", isDuck(number));
-        properties.put("palindromic", isPalindromic(number));
-        properties.put("gapful", isGapful(number));
-        return properties;
-    }
-
-    private static List<String> filterProperties(Map<String, Boolean> properties) {
+    private static List<String> filterProperties(String number) {
         List<String> trueProperties = new ArrayList<>();
-        for (Map.Entry<String, Boolean> entry : properties.entrySet()) {
-            if (entry.getValue()) trueProperties.add(entry.getKey());
+        for (Map.Entry<String, Function<String, Boolean>> entry : functionMap.entrySet()) {
+            if (entry.getValue().apply(number)) trueProperties.add(entry.getKey());
         }
         return trueProperties;
     }
