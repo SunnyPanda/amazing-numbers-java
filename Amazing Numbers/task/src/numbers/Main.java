@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static numbers.Utils.*;
+
 public class Main {
     private static final Scanner in = new Scanner(System.in);
     public static void main(String[] args) {
@@ -79,7 +81,7 @@ public class Main {
                         duck: %b
                  palindromic: %b
                       gapful: %b
-                """, number, isEven(num), !isEven(num), isBuzz(num), isDuck(num), isPalindromic(num), isGapful(num));
+                """, number, isEven(num), isOdd(num), isBuzz(num), isDuck(num), isPalindromic(num), isGapful(num));
     }
 
     private static void showMultipleProperties(long number, long count) {
@@ -91,6 +93,7 @@ public class Main {
     private static String getProperties(long number) {
         Map<String, Boolean> properties = fillProperties(number);
         List<String> trueProperties = filterProperties(properties);
+
         StringBuilder sb = new StringBuilder(String.format("%d is", number));
         for (int i = 0; i < trueProperties.size(); i++) {
             sb.append(" ").append(trueProperties.get(i));
@@ -102,7 +105,7 @@ public class Main {
     private static Map<String, Boolean> fillProperties(long number) {
         Map<String, Boolean> properties = new HashMap<>();
         properties.put("even", isEven(number));
-        properties.put("odd", !isEven(number));
+        properties.put("odd", isOdd(number));
         properties.put("buzz", isBuzz(number));
         properties.put("duck", isDuck(number));
         properties.put("palindromic", isPalindromic(number));
@@ -118,33 +121,7 @@ public class Main {
         return trueProperties;
     }
 
-    private static boolean isEven(long number) {
-        return number % 2 == 0;
-    }
 
-    private static boolean isBuzz(long number) {
-        boolean divBy7 = number % 7 == 0;
-        boolean endsWith7 = number % 10 == 7;
-        return divBy7 || endsWith7;
-    }
 
-    private static boolean isDuck(long number) {
-        return String.valueOf(number).lastIndexOf("0") > 0;
-    }
 
-    private static boolean isPalindromic(long number) {
-        String str = String.valueOf(number);
-        for (int i = 0, j = str.length() - 1; i <= j; i++, j--) {
-            if (str.charAt(i) != str.charAt(j)) return false;
-        }
-        return true;
-    }
-
-    private static boolean isGapful(long number) {
-        String str = String.valueOf(number);
-        if (str.length() < 3) return false;
-
-        int gap = Integer.parseInt(str.charAt(0) + str.substring(str.length() - 1));
-        return number % gap == 0;
-    }
  }
