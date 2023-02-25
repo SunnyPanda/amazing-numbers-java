@@ -23,7 +23,7 @@ public class Main {
                 }
                 default -> {
                     if (checkParameters(input.get(0), input.get(1)))
-                        showMultipleProperties(Long.parseLong(input.get(0)), Long.parseLong(input.get(1)));
+                        showMultipleProperties(input.get(0), input.get(1));
                 }
             }
 
@@ -72,7 +72,6 @@ public class Main {
     }
 
     private static void showProperties(String number) {
-        long num = Long.parseLong(number);
         System.out.printf("""
                 Properties of %s
                         even: %b
@@ -81,20 +80,22 @@ public class Main {
                         duck: %b
                  palindromic: %b
                       gapful: %b
-                """, number, isEven(num), isOdd(num), isBuzz(num), isDuck(num), isPalindromic(num), isGapful(num));
+                """, number, isEven(number), isOdd(number), isBuzz(number), isDuck(number), isPalindromic(number),
+                isGapful(number));
     }
 
-    private static void showMultipleProperties(long number, long count) {
-        for (long i = 0; i < count; i++, number++) {
+    private static void showMultipleProperties(String number, String count) {
+        long num = Long.parseLong(number);
+        for (long i = 0; i < Long.parseLong(count); i++, num++) {
             System.out.println(getProperties(number));
         }
     }
 
-    private static String getProperties(long number) {
+    private static String getProperties(String number) {
         Map<String, Boolean> properties = fillProperties(number);
         List<String> trueProperties = filterProperties(properties);
 
-        StringBuilder sb = new StringBuilder(String.format("%d is", number));
+        StringBuilder sb = new StringBuilder(String.format("%s is", number));
         for (int i = 0; i < trueProperties.size(); i++) {
             sb.append(" ").append(trueProperties.get(i));
             if (i < trueProperties.size() - 1) sb.append(",");
@@ -102,7 +103,7 @@ public class Main {
         return sb.toString();
     }
 
-    private static Map<String, Boolean> fillProperties(long number) {
+    private static Map<String, Boolean> fillProperties(String number) {
         Map<String, Boolean> properties = new HashMap<>();
         properties.put("even", isEven(number));
         properties.put("odd", isOdd(number));
