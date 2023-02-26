@@ -5,8 +5,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static numbers.Utils.*;
-import static numbers.Validators.checkParameters;
-import static numbers.Validators.isExistingProperty;
+import static numbers.Validators.*;
 
 public class Main {
     private static final Scanner in = new Scanner(System.in);
@@ -26,22 +25,13 @@ public class Main {
         System.out.print("Enter a request: ");
         List<String> input = getInput().stream().filter(s -> !s.isEmpty()).collect(Collectors.toList());
         while (input.isEmpty() || !input.get(0).equals("0")) {
-            switch (input.size()) {
-                case 0 -> System.out.println(supportedRequest());
-                case 1 -> {
-                    String number = input.get(0);
-                    if (checkParameters(number, String.valueOf(Integer.MIN_VALUE)))
-                        showProperties(number);
+            if (checkInput(input))
+                switch (input.size()) {
+                    case 0 -> System.out.println(supportedRequest());
+                    case 1 -> showProperties(input.get(0));
+                    case 2 -> showMultipleProperties(input.get(0), input.get(1));
+                    default -> showSpecificProperty(input.get(0), input.get(1), input.get(2));
                 }
-                case 2 -> {
-                    if (checkParameters(input.get(0), input.get(1)))
-                        showMultipleProperties(input.get(0), input.get(1));
-                }
-                default -> {
-                    if (checkParameters(input.get(0), input.get(1)) && isExistingProperty(input.get(2)))
-                        showSpecificProperty(input.get(0), input.get(1), input.get(2));
-                }
-            }
 
             System.out.print("\nEnter a request: ");
             input = getInput();

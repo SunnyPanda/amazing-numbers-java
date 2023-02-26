@@ -6,6 +6,16 @@ import java.util.regex.Pattern;
 public final class Validators {
 
     private static final List<String> PROPERTIES = List.of("BUZZ", "DUCK", "PALINDROMIC", "GAPFUL", "SPY", "EVEN", "ODD");
+
+    static boolean checkInput(List<String> parameters) {
+        boolean result;
+        switch (parameters.size()) {
+            case 1 -> result = checkParameters(parameters.get(0), String.valueOf(Integer.MIN_VALUE));
+            case 2 -> result = checkParameters(parameters.get(0), parameters.get(1));
+            default -> result = checkParameters(parameters.get(0), parameters.get(1)) && isExistingProperty(parameters.get(2));
+        }
+        return result;
+    }
     static boolean checkParameters(String first, String second) {
         Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
         boolean firstMatches = pattern.matcher(first).matches();
