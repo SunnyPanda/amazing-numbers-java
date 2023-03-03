@@ -46,4 +46,14 @@ public final class Utils {
         }
         return sum == prod;
     }
+
+    static boolean isSquare(String number) {
+        long num = Long.parseLong(number);
+        double sqrt = Math.sqrt(num);
+        return sqrt == Math.floor(sqrt);
+    }
+
+    static boolean isSunny(String number) {
+        return isSquare("" + (Long.parseLong(number) + 1));
+    }
 }

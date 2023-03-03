@@ -18,6 +18,8 @@ public class Main {
         functionMap.put("palindromic", Utils::isPalindromic);
         functionMap.put("gapful", Utils::isGapful);
         functionMap.put("spy", Utils::isSpy);
+        functionMap.put("square", Utils::isSquare);
+        functionMap.put("sunny", Utils::isSunny);
     }
     public static void main(String[] args) {
         greet();
@@ -30,7 +32,8 @@ public class Main {
                     case 0 -> System.out.println(supportedRequest());
                     case 1 -> showProperties(input.get(0));
                     case 2 -> showMultipleProperties(input.get(0), input.get(1));
-                    default -> showSpecificProperty(input.get(0), input.get(1), input.get(2));
+                    case 3 -> showSpecificProperty(input.get(0), input.get(1), input.get(2), null);
+                    case 4 -> showSpecificProperty(input.get(0), input.get(1), input.get(2), input.get(3));
                 }
 
             System.out.print("\nEnter a request: ");
@@ -54,7 +57,7 @@ public class Main {
                 - enter two natural numbers to obtain the properties of the list:
                   * the first parameter represents a starting number;
                   * the second parameters show how many consecutive numbers are to be processed;
-                - two natural numbers and a property to search for;
+                - two natural numbers and two properties to search for;
                 - separate the parameters with one space;
                 - enter 0 to exit.
                 """;
@@ -74,16 +77,22 @@ public class Main {
                  palindromic: %b
                       gapful: %b
                          spy: %b
+                      square: %b
+                       sunny: %b
                 """, number, isEven(number), isOdd(number), isBuzz(number), isDuck(number), isPalindromic(number),
-                isGapful(number), isSpy(number));
+                isGapful(number), isSpy(number), isSquare(number), isSunny(number));
     }
 
-    private static void showSpecificProperty(String number, String count, String property) {
+    private static void showSpecificProperty(String number, String count, String prop1, String prop2) {
         long num = Long.parseLong(number);
         List<String> filteredNumbers = new ArrayList<>();
         for (long i = 0; i < Long.parseLong(count); num++) {
-            if (functionMap.get(property.toLowerCase()).apply(String.valueOf(num))) {
-                filteredNumbers.add(String.valueOf(num));
+            String newNumber = String.valueOf(num);
+            boolean oneCondition = functionMap.get(prop1.toLowerCase()).apply(newNumber);
+            Function<Boolean, Boolean> twoConditions = cond -> cond && functionMap.get(prop2.toLowerCase()).apply(newNumber);
+            boolean condition = Objects.isNull(prop2) ? oneCondition : twoConditions.apply(oneCondition);
+            if (condition) {
+                filteredNumbers.add(newNumber);
                 i++;
             }
         }
